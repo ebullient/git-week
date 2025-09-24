@@ -65,7 +65,7 @@ function generateCumulativeData(stargazers, finalWeek) {
     // Filter out stargazers after the target Monday
     const filteredStargazers = stargazers
             .filter(star => star < upperBound)
-            .sort();
+            .sort((a, b) => a.getTime() - b.getTime());
     if (finalWeek) {
         console.log(`Filtered ${stargazers.length} stargazers to ${filteredStargazers.length} (before ${finalMonday})`);
     }
@@ -73,108 +73,17 @@ function generateCumulativeData(stargazers, finalWeek) {
     if (filteredStargazers.length === 0) {
         return {};
     }
-
     const cumulative = {};
 
-    // Generate weekly cumulative counts for weeks that actually have stars
-    for (const star of filteredStargazers) {
+    for (let i = 0; i < filteredStargazers.length; i++) {
+        const star = filteredStargazers[i];
         const starMonday = getMonday(star);
+        const cumulativeCount = i + 1; // This star is the (i+1)th star overall
 
-        // Only update if this is a new Monday or higher count
-        const existingCount = cumulative[starMonday] || 0;
-        cumulative[starMonday] = existingCount + 1;
+        // Store cumulative count (will overwrite if multiple stars in same Monday)
+        cumulative[starMonday] = cumulativeCount;
     }
     return cumulative;
-}
-
-function generateChartsMarkdown(allData, outputPath) {
-    // Get all unique dates across all repositories
-    const allDates = new Set();
-    for (const repoName of Object.keys(allData)) {
-        const repo = allData[repoName];
-        if (repo) {
-            for (const date of Object.keys(repo.cumulative)) {
-                allDates.add(date);
-            }
-        }
-    }
-
-    // Sort dates and get range
-    const sortedDates = Array.from(allDates).sort();
-    const begin = sortedDates[0];
-    const end = sortedDates[sortedDates.length - 1];
-
-    // Generate all Mondays between begin and end
-    const allMondays = [];
-    const current = new Date(`${begin}T00:00:00.000Z`);
-    const endDate = new Date(`${end}T00:00:00.000Z`);
-
-    while (current <= endDate) {
-        allMondays.push(formatDate(current));
-        current.setUTCDate(current.getUTCDate() + 7);
-    }
-
-    // Generate YAML chart configuration
-    const chartYaml = [
-        'type: line',
-        `labels: [${allMondays.map(date => `"${date}"`).join(', ')}]`,
-        'series:'
-    ];
-
-    // Create series for each repository in input order
-    for (const repoName of Object.keys(allData)) {
-        const repo = allData[repoName];
-        const cumulative = repo.cumulative;
-
-        const data = [];
-        let prev = 0;
-        for(const date of allMondays) {
-            const add = cumulative[date] || 0;
-            prev = prev + add;
-            data.push(prev);
-        }
-
-        chartYaml.push(
-            `  - title: "${repo.name}"`,
-            `    data: [${data.join(', ')}]`,
-            '    pointRadius: 0',
-            '    pointHoverRadius: 0'
-        );
-        repo.total = prev;
-    }
-
-    // Generate markdown content
-    const content = [
-        '# Repository Stargazers Analysis',
-        '',
-        '## Chart',
-        '',
-        '```chart',
-        chartYaml.join('\n'),
-        '```',
-        '',
-        '## Summary',
-        ''
-    ];
-
-    // Add summary for each repository in input order
-    for (const repoName of Object.keys(allData)) {
-        const repo = allData[repoName];
-        const dates = Object.keys(repo.cumulative);
-        const firstDate = dates[0];
-        const latestDate = dates[dates.length - 1];
-        const count = repo.total;
-
-        content.push(`### ${repo.name}`);
-        content.push(`- **Total Stars**: ${count}`);
-        content.push(`- **Data Points**: ${dates.length}`);
-        content.push(`- **Date Range**: ${firstDate} to ${latestDate}`);
-        content.push('');
-    }
-
-    // Write the file
-    writeFileSync(outputPath, content.join('\n'));
-    console.log(`Generated charts markdown: ${outputPath}`);
 }
 
 function main() {
@@ -226,21 +135,6 @@ function main() {
     const outputPath = `${outputDir}/stargazers.json`;
     writeFileSync(outputPath, JSON.stringify(Object.values(allData), null, 2));
     console.log(`\\nStargazer data updated: ${outputPath}`);
-
-    // Generate charts markdown using input order
-    const chartsPath = `${outputDir}/stargazers.md`;
-    generateChartsMarkdown(allData, chartsPath);
-
-    // // Print summary
-    // console.log('\\nSummary:');
-    // for (const repo of allData) {
-    //     const dates = Object.keys(repo.cumulative);
-    //     if (dates.length > 0) {
-    //         const latestDate = dates.sort().pop();
-    //         const latestCount = repo.cumulative[latestDate];
-    //         console.log(`- ${repo.name}: ${latestCount} stars (as of ${latestDate})`);
-    //     }
-    // }
 }
 
 main();
