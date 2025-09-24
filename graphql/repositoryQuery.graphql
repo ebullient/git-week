@@ -1,0 +1,26 @@
+query Repository($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    nameWithOwner
+    stargazerCount
+    forkCount
+    description
+    url
+    primaryLanguage {
+      name
+      color
+    }
+    languages(first: 10) {
+      nodes {
+        name
+        color
+      }
+    }
+    repositoryTopics(first: 20) {
+      nodes {
+        topic {
+          name
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "git-week",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "go": "node src/go.js",
+    "stars": "node src/stars.js",
+    "lint": "npx @biomejs/biome lint ./src",
+    "format": "npx @biomejs/biome format ./src",
+    "fix": "npx @biomejs/biome check --write ./src"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^20.12.12",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
+  }
+}

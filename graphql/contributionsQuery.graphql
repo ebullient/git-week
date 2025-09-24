@@ -1,0 +1,50 @@
+query UserContributions($login: String!, $from: DateTime!, $to: DateTime!) {
+  user(login: $login) {
+    contributionsCollection(from: $from, to: $to) {
+      contributionCalendar {
+        totalContributions
+      }
+      totalCommitContributions
+      totalIssueContributions
+      totalPullRequestContributions
+      totalPullRequestReviewContributions
+      totalRepositoryContributions
+      commitContributionsByRepository {
+        repository {
+          nameWithOwner
+          name
+          owner {
+            login
+          }
+        }
+        contributions {
+          totalCount
+        }
+      }
+      issueContributionsByRepository {
+        repository {
+          nameWithOwner
+        }
+        contributions {
+          totalCount
+        }
+      }
+      pullRequestContributionsByRepository {
+        repository {
+          nameWithOwner
+        }
+        contributions {
+          totalCount
+        }
+      }
+      pullRequestReviewContributionsByRepository {
+        repository {
+          nameWithOwner
+        }
+        contributions {
+          totalCount
+        }
+      }
+    }
+  }
+}

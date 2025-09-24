@@ -1,0 +1,15 @@
+query StargazerHistory($owner: String!, $name: String!, $first: Int!, $after: String) {
+  repository(owner: $owner, name: $name) {
+    nameWithOwner
+    stargazers(first: $first, after: $after, orderBy: {field: STARRED_AT, direction: ASC}) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        starredAt
+      }
+    }
+  }
+}

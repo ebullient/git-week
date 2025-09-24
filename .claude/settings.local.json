@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Volumes/Data/git/commonhaus/infra/vote-record-actions/**)",
+      "Read(//Users/elh/git/commonhaus/infra/vote-record-actions/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
