@@ -53,7 +53,6 @@ npm run stars username/repo1,username/repo2 /path/for/output/ 2025-09-15
 
 The output files will be:
 - `<output_dir>/stargazers.json` - Raw data
-- `<output_dir>/stargazers.md` - Obsidian charts visualization
 
 ## Output Formats
 
@@ -67,14 +66,6 @@ The output files will be:
 
 - Array of repositories with cumulative stargazer counts by week
 - Weekly data points showing growth over time
-- Automatically merges with existing data
-
-### Stargazer Charts (Markdown)
-
-- Compatible with Obsidian Charts plugin
-- Line chart visualization of stargazer growth over time
-- Summary table with current counts
-- Data table with all historical points
 
 ## Project Structure
 
