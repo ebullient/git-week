@@ -18,7 +18,7 @@ function fetchAllStargazers(owner, name) {
     let after = null;
     const batchSize = 100;
 
-    console.log(`Fetching stargazers for ${owner}/${name}...`);
+    console.log(`   Fetching stargazers for ${owner}/${name}...`);
 
     while (hasNextPage) {
         const variables = {
@@ -46,10 +46,10 @@ function fetchAllStargazers(owner, name) {
         hasNextPage = stargazerData.pageInfo.hasNextPage;
         after = stargazerData.pageInfo.endCursor;
 
-        console.log(`Fetched ${stargazers.length} stargazers so far...`);
+        console.log('   Fetched', stargazers.length, 'stargazers so far...');
     }
 
-    console.log('Total stargazers fetched', stargazers.length);
+    console.log('   Total stargazers fetched', stargazers.length);
     return stargazers;
 }
 
@@ -67,7 +67,7 @@ function generateCumulativeData(stargazers, finalWeek) {
             .filter(star => star < upperBound)
             .sort((a, b) => a.getTime() - b.getTime());
     if (finalWeek) {
-        console.log(`Filtered ${stargazers.length} stargazers to ${filteredStargazers.length} (before ${finalMonday})`);
+        console.log('   Filtered', stargazers.length, 'stargazers to', filteredStargazers.length, '(those before', finalMonday, ')');
     }
 
     if (filteredStargazers.length === 0) {
@@ -115,7 +115,7 @@ function main() {
             const { owner, name } = parseRepoString(repoString);
             const repoName = `${owner}/${name}`;
 
-            console.log(`\\nProcessing ${repoName}...`);
+            console.log('🚀 Processing', repoName);
 
             const stargazers = fetchAllStargazers(owner, name);
             const cumulativeData = generateCumulativeData(stargazers, finalWeek);
@@ -125,16 +125,16 @@ function main() {
                 name: repoName,
                 cumulative: Object.fromEntries(sortedCumulative)
             };
-            console.log(`Updated data for ${repoName}`);
+            console.log('   Updated data for', repoName);
         } catch (error) {
-            console.error(`Error processing repository ${repoString}:`, error.message);
+            console.error(` Error processing repository ${repoString}:`, error.message);
         }
     }
 
     // Write updated data
     const outputPath = `${outputDir}/stargazers.json`;
     writeFileSync(outputPath, JSON.stringify(Object.values(allData), null, 2));
-    console.log(`\\nStargazer data updated: ${outputPath}`);
+    console.log('✅ Stargazer data updated:', outputPath);
 }
 
 main();
