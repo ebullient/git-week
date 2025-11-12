@@ -9,6 +9,7 @@ query UserContributions($login: String!, $from: DateTime!, $to: DateTime!) {
       totalPullRequestContributions
       totalPullRequestReviewContributions
       totalRepositoryContributions
+      restrictedContributionsCount
       commitContributionsByRepository {
         repository {
           nameWithOwner

@@ -32,7 +32,10 @@ npm run go username /path/for/output/
 npm run go username /path/for/output/ 2025-09-15
 ```
 
-The output file will be placed at: `<output_dir>/<year>/<monday_date>_gh.md`
+The output files will be placed at:
+
+- `<output_dir>/<year>/<monday_date>_gh.md` - Contribution summary report
+- `<output_dir>/assets/gh-activity.md` - Daily commit activity with messages
 
 ### Update Stargazer Data
 
@@ -61,6 +64,12 @@ The output files will be:
 - YAML frontmatter with contribution counts and repository tags
 - Summary of total contributions by type
 - Table of contributions by repository
+
+### Activity Report (Markdown)
+
+- Commit activity grouped by repository
+- Checkbox format with commit messages and dates
+- Generated from GitHub event stream (PushEvents)
 
 ### Stargazer Data (JSON)
 

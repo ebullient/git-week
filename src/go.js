@@ -2,7 +2,7 @@
 
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
-import { runGraphQL } from './lib/github.js';
+import { runGraphQL, fetchUserEvents, fetchCommit } from './lib/github.js';
 import { getMonday, getNextMonday } from './lib/dateUtils.js';
 
 function generateMarkdown(outputPath, contributions) {
@@ -106,6 +106,72 @@ function generateMarkdown(outputPath, contributions) {
     console.log(`Generated contribution report: ${outputPath}`);
 }
 
+function generateActivityMarkdown(outputPath, username, weekStart, weekEnd) {
+    console.log(`Fetching daily commit activity for ${username}...`);
+
+    // Fetch all user events
+    const events = fetchUserEvents(username);
+
+    // Group push events by repository within the week
+    const commitsByRepo = new Map();
+
+    for (const event of events) {
+        if (event.type !== 'PushEvent') {
+            continue;
+        }
+
+        const eventDate = new Date(event.created_at);
+
+        // Filter events within the week
+        if (eventDate < weekStart || eventDate >= weekEnd) {
+            continue;
+        }
+
+        const repoName = event.repo.name;
+        const sha = event.payload.head;
+
+        if (!commitsByRepo.has(repoName)) {
+            commitsByRepo.set(repoName, []);
+        }
+
+        commitsByRepo.get(repoName).push({ sha });
+    }
+
+    // Generate markdown content
+    const lines = ['# GitHub Activity for the Week', ''];
+
+    // Sort repositories alphabetically
+    const sortedRepos = Array.from(commitsByRepo.keys()).sort();
+
+    for (const repoName of sortedRepos) {
+        lines.push(`## ${repoName}`, '');
+
+        const commits = commitsByRepo.get(repoName);
+
+        for (const { sha } of commits) {
+            const commitData = fetchCommit(repoName, sha);
+            if (commitData) {
+                lines.push(`- [x] ${commitData.message} (${commitData.date})`);
+            }
+        }
+
+        lines.push('');
+    }
+
+    if (sortedRepos.length === 0) {
+        lines.push('No push events found for this week.');
+    }
+
+    const content = lines.join('\n');
+
+    // Ensure output directory exists
+    mkdirSync(dirname(outputPath), { recursive: true });
+
+    // Write file
+    writeFileSync(outputPath, content);
+    console.log(`Generated activity report: ${outputPath}`);
+}
+
 function main() {
     const args = process.argv.slice(2);
 
@@ -135,6 +201,7 @@ function main() {
 
     // Execute query
     const contributions = runGraphQL('contributionsQuery', variables);
+    console.log(JSON.stringify(contributions));
 
     if (!contributions.data?.user) {
         console.error('Failed to fetch user data');
@@ -147,6 +214,10 @@ function main() {
 
     // Generate markdown
     generateMarkdown(outputPath, contributions);
+
+    // Generate activity markdown to assets/gh-activity.md
+    const activityPath = join(outputDir, 'assets', 'gh-activity.md');
+    generateActivityMarkdown(activityPath, username, weekStart, weekEnd);
 }
 
 main();

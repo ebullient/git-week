@@ -45,3 +45,55 @@ export function runGraphQL(queryFile, variables = {}) {
         process.exit(1);
     }
 }
+
+export function fetchUserEvents(username) {
+    const args = [
+        'api',
+        '/users/' + username + '/events',
+        '--paginate'
+    ];
+
+    const { status, stdout, stderr } = spawnSync('gh', args);
+
+    const output = new TextDecoder().decode(stdout).trim();
+
+    if (status !== 0) {
+        const errorOutput = new TextDecoder().decode(stderr);
+        console.error(`Failed to fetch events (${status}):`, errorOutput);
+        process.exit(1);
+    }
+
+    try {
+        return JSON.parse(output);
+    } catch (error) {
+        console.error('Failed to parse events response:', error.message);
+        console.error('Raw output:', output);
+        process.exit(1);
+    }
+}
+
+export function fetchCommit(repoName, sha) {
+    const args = [
+        'api',
+        `/repos/${repoName}/commits/${sha}`,
+        '--jq',
+        '{message: (.commit.message | split("\\n")[0]), date: (.commit.author.date | split("T")[0])}'
+    ];
+
+    const { status, stdout, stderr } = spawnSync('gh', args);
+
+    const output = new TextDecoder().decode(stdout).trim();
+
+    if (status !== 0) {
+        const errorOutput = new TextDecoder().decode(stderr);
+        console.error(`Failed to fetch commit ${sha} (${status}):`, errorOutput);
+        return null;
+    }
+
+    try {
+        return JSON.parse(output);
+    } catch (error) {
+        console.error('Failed to parse commit response:', error.message);
+        return null;
+    }
+}
