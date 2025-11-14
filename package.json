@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "monday": "node src/date.js",
     "go": "node src/go.js",
     "stars": "node src/stars.js",
     "lint": "npx @biomejs/biome lint ./src",
