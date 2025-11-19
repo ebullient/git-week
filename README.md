@@ -26,16 +26,16 @@ npm run go <username> <output_dir> [date]
 Examples:
 ```bash
 # Generate report for current week
-npm run go username /path/for/output/
+npm run go username /path/for/output/ /path/for/activity/
 
 # Generate report for specific week (finds nearest Monday)
-npm run go username /path/for/output/ 2025-09-15
+npm run go username /path/for/output/ /path/for/activity/ 2025-09-15
 ```
 
 The output files will be placed at:
 
 - `<output_dir>/<year>/<monday_date>_gh.md` - Contribution summary report
-- `<output_dir>/assets/gh-activity.md` - Daily commit activity with messages
+- `<activity_dir>/gh-activity.md` - Daily commit activity with messages
 
 ### Update Stargazer Data
 
@@ -54,8 +54,7 @@ npm run stars username/repo1,username/repo2 /path/for/output/
 npm run stars username/repo1,username/repo2 /path/for/output/ 2025-09-15
 ```
 
-The output files will be:
-- `<output_dir>/stargazers.json` - Raw data
+The output file will be `<output_dir>/stargazers.json`
 
 ## Output Formats
 

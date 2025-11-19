@@ -182,7 +182,8 @@ function main() {
 
     const username = args[0];
     const outputDir = args[1];
-    const dateArg = args[2];
+    const activityDir = args[2];
+    const dateArg = args[3];
 
     // Calculate week start (Monday) and end (next Monday for exclusive range)
     const weekStartStr = getMonday(dateArg);
@@ -216,7 +217,7 @@ function main() {
     generateMarkdown(outputPath, contributions);
 
     // Generate activity markdown to assets/gh-activity.md
-    const activityPath = join(outputDir, 'assets', 'gh-activity.md');
+    const activityPath = join(activityDir, 'gh-activity.md');
     generateActivityMarkdown(activityPath, username, weekStart, weekEnd);
 }
 
